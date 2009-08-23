@@ -10,7 +10,7 @@
     <script type="text/javascript" src="../lib/StarJs/Solar.js"></script>
     <script type="text/javascript">
       // Write data to console.
-      var tz_offset = +6;
+      var tz_offset = +7;
       var today = StarJs.Time.dt2mjd({
           year: 2009, month: 8, day: 23,
           hour: 0, minute: 0, second: 0
@@ -20,7 +20,7 @@
 
       console.debug(StarJs.Solar.sunAndMoonEvents(today, tomorrow,
                           84*StarJs.Math.DEG2RAD,
-                          57*StarJs.Math.DEG2RAD
+                          53*StarJs.Math.DEG2RAD
       ));
     </script>
   </body>
