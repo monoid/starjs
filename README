@@ -1,3 +1,5 @@
 StarJs is a JavaScript implementation of formulae and algorithms described
 in 'Astronomy on the Personal Computer' by O. Montenbrook and T. Pfleger
 (4nd edition).
+
+build.sh uses Google Closure Compiler.
