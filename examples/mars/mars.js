@@ -18,8 +18,8 @@ function init(id) {
     var precessionMatrix = StarJs.Coord.precessionEquMatrix(0, StarJs.Time.mjd2jct(mjNow));
 
     for (i = 0; i < 24; ++i) {
+        // time i hours from now
         var mjdi = mjNow+i/24;
-        // time i days from now
         var time = StarJs.Time.mjd2dt(mjdi);
 
         // Julian centuries after J2000.0.
