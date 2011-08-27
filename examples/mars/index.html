@@ -1,0 +1,15 @@
+<!DOCUMENT html>
+<html>
+  <head><title>Mars coordinates for next 24 hours</title></head>
+  <body onload="init('output')">
+    <noscript>
+      Please, turn JavaScript.
+    </noscript>
+    <pre id="output"></pre>
+    <p>Fields: UTC date, equatorial coordinates (Ra and Dec), horizontal
+    coordinates (height and azumuth; azumuth 0 is South).
+    <p>Observer's coordinates are defined at top of <a href="mars.js">mars.js</a>.</p>
+    <script src="../../StarJs.debug.js"></script>
+    <script src="mars.js"></script>
+  </body>
+</html>
