@@ -2,15 +2,8 @@ function formatDate(date) {
     return date.year+'.'+date.month+'.'+date.day+' '+date.hour+':'+date.minute+':'+Math.floor(date.second);
 }
 
-function init(id) {
-    var output = document.getElementById(id);
-
-    var mjNow = StarJs.Time.time2mjd(new Date()); // Current Modified Julian day
-
-    var R2D = StarJs.Math.RAD2DEG, D2R = StarJs.Math.DEG2RAD;
-
-    var text = '';
-
+function init() {
+    var D2R = StarJs.Math.DEG2RAD;
     /* Elements from
        http://scully.cfa.harvard.edu/cgi-bin/returnprepeph.cgi?d=c&o=CK10X010
 
@@ -35,6 +28,44 @@ From 2058 observations 2010 Dec. 10-2011 Aug. 1, mean residual 0".5.
         node: 323.2267*D2R,
         incl: 1.8392*D2R
     };
+
+    /*
+    http://www.minorplanetcenter.net/mpec/K12/K12A52.html
+
+    C/2009 P1 (Garradd)
+Epoch 2011 Dec. 25.0 TT = JDT 2455920.5
+T 2011 Dec. 23.67758 TT                                 MPC
+q   1.5505367            (2000.0)            P               Q
+z  -0.0006782      Peri.   90.74770     -0.16661319     -0.82691127
+ +/-0.0000002      Node   325.99770     -0.58719595     +0.52078702
+e   1.0010516      Incl.  106.17749     +0.79211171     +0.21212879
+From 4943 observations 2009 Aug. 13-2011 Dec. 4, mean residual 0".4.
+    */
+    var C2009P1_param = {
+        title: 'C/2009 P1 (Garradd)',
+        t0: 2455920.5-2400000.5,
+        q: 1.5505367,
+        z: -0.0006782,
+        e: 1.0010516,
+        peri: 90.74770*D2R,
+        node: 325.99770*D2R,
+        incl: 106.17749*D2R
+    };
+
+    calc('output', params);
+    calc('output2', C2009P1_param);
+}
+    
+function calc(id, params) {
+
+    var output = document.getElementById(id);
+
+    var mjNow = StarJs.Time.time2mjd(new Date()); // Current Modified Julian day
+
+    var R2D = StarJs.Math.RAD2DEG;
+
+    var text = '';
+
 
     // Gauss vectors for comet's orbit
     var pqr = StarJs.Kepler.gaussVec(params.node, params.incl, params.peri);
