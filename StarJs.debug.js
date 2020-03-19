@@ -100,6 +100,10 @@ StarJs.Math.Dms = function (sign_or_angle, degree, minute, second) {
 
 /**
  * Convert angle DMS (degree-minute-second) to float degree value.
+ * @param {number} sign
+ * @param {number} deg
+ * @param {number} minute
+ * @param {number} second
  */
 StarJs.Math.dms2deg = function (sign, deg, minute, second) {
     return sign * (deg + minute / 60.0 + second / 3600.0);
@@ -135,6 +139,11 @@ StarJs.Math.angle2hms = function (angle) {
     return res;
 };
 
+/**
+ * @param {number} ym
+ * @param {number} y0
+ * @param {number} yp
+ */
 StarJs.Math.quadInterpolation = function (ym, y0, yp) {
     var a = 0.5 * (yp + ym) - y0, b = 0.5 * (yp - ym), c = y0, xe = -b / (2 * a), ye = (a * xe + b) * xe + c;
     var dis = b * b - 4 * a * c, roots = [], dx, r1, r2;
@@ -156,13 +165,17 @@ StarJs.Math.quadInterpolation = function (ym, y0, yp) {
 
 /**
  * Hyperbolic sinus.
+ * @param {number} x
+ * @return {number}
  */
 StarJs.Math.sinh = function (x) {
     return (Math.exp(x) - Math.exp(-x))/2;
 };
 
 /**
- * Hyperbolic cosinus.
+ * Hyperbolic cosine.
+ * @param {number} x
+ * @return {number}
  */
 StarJs.Math.cosh = function (x) {
     return (Math.exp(x) + Math.exp(-x))/2;
@@ -186,12 +199,18 @@ StarJs.Vector.Vector3 = function (x, y, z) {
         return Math.sqrt(this['x'] * this['x'] + this['y'] * this['y'] + this['z'] * this['z']);
     };
 
+    /** Return new Vector3 as sum of this and the v3.
+     * @param {StarJs.Vector.Vector3} v3
+     */
     p.add = function (v3) {
         return new StarJs.Vector.Vector3(this['x'] + v3['x'],
                                          this['y'] + v3['y'],
                                          this['z'] + v3['z']);
     };
 
+    /** Return new Vector3 as v3 substracted from this.
+     * @param {StarJs.Vector.Vector3} v3
+     */
     p.sub = function (v3) {
         return new StarJs.Vector.Vector3(this['x'] - v3['x'],
                                          this['y'] - v3['y'],
@@ -202,16 +221,22 @@ StarJs.Vector.Vector3 = function (x, y, z) {
         return new StarJs.Vector.Vector3(-this['x'], -this['y'], -this['z']);
     };
 
+    /** Return new Vector3 multiplied by number a.
+     * @param {number} a
+     */
     p.scale = function (a) {
         return new StarJs.Vector.Vector3(a * this['x'], a * this['y'], a * this['z']);
     };
 
+    /** Copy this vector.
+     */
     p.clone = function () {
         return new StarJs.Vector.Vector3(this['x'], this['y'], this['z']);
     };
 }(StarJs.Vector.Vector3.prototype));
 
 /** @constructor
+ * @param {number|StarJs.Vector.Vector3} az_or_v3
  * @param {number=} elev
  * @param {number=} rad
  */
@@ -253,14 +278,17 @@ StarJs.Vector.Polar3 = function (az_or_v3, elev, rad) {
 }(StarJs.Vector.Polar3.prototype));
 
 /** @constructor
- * @param {(StarJs.Vector.Vector3|boolean)=} v2
+ * @param {(StarJs.Vector.Vector3|boolean)=} v2_or_reuse_flag
  * @param {StarJs.Vector.Vector3=} v3
  */
-StarJs.Vector.Matrix3 = function (v1, v2, v3) {
+StarJs.Vector.Matrix3 = function (v1, v2_or_reuse_flag, v3) {
     if (arguments.length === 3) {
-        this['mat'] = [[v1['x'], v1['y'], v1['z']], [v2['x'], v2['y'], v2['z']], [v3['x'], v3['y'], v3['z']]];
+        var v2 = v2_or_reuse_flag;  // Just for brevity.
+        this['mat'] = [[v1['x'], v1['y'], v1['z']],
+                       [v2['x'], v2['y'], v2['z']],
+                       [v3['x'], v3['y'], v3['z']]];
     } else {
-        if (v2) {
+        if (v2_or_reuse_flag) {
             this['mat'] = v1;
         } else {
             this['mat'] = [[v1[0][0], v1[0][1], v1[0][2]],
@@ -271,6 +299,9 @@ StarJs.Vector.Matrix3 = function (v1, v2, v3) {
 };
 
 (function (p) {
+    /** Multiply matrix-to-vector multiplication.
+     * @param {StarJs.Vector.Vector3} v
+     */
     p.apply = function (v) {
         var l = this['mat'][0];
         var x = l[0] * v['x'] + l[1] * v['y'] + l[2] * v['z'];
@@ -284,6 +315,9 @@ StarJs.Vector.Matrix3 = function (v1, v2, v3) {
         return new StarJs.Vector.Vector3(x, y, z);
     };
 
+    /** Perform a matrix multiplication, returning a new matrix.
+     * @param {StarJs.Vector.Matrix3} matrix right matrix.
+     */
     p.mult = function (matrix) {
         var res = [[0, 0, 0], [0, 0, 0], [0, 0, 0]];
         var mat = matrix['mat'];
@@ -300,6 +334,9 @@ StarJs.Vector.Matrix3 = function (v1, v2, v3) {
     };
 }(StarJs.Vector.Matrix3.prototype));
 
+/** Return x-rotation matrix by angle phi.
+ * @param {number} phi.
+ */
 StarJs.Vector.Matrix3.r_x = function (phi) {
     var cp = Math.cos(phi), sp = Math.sin(phi);
     return new StarJs.Vector.Matrix3([[1.0, 0.0, 0.0],
@@ -307,6 +344,9 @@ StarJs.Vector.Matrix3.r_x = function (phi) {
                                       [0.0, -sp,  cp]]);
 };
 
+/** Return y-rotation matrix by angle phi.
+ * @param {number} phi.
+ */
 StarJs.Vector.Matrix3.r_y = function (phi) {
     var cp = Math.cos(phi), sp = Math.sin(phi);
     return new StarJs.Vector.Matrix3([[ cp, 0.0, -sp],
@@ -314,6 +354,9 @@ StarJs.Vector.Matrix3.r_y = function (phi) {
                                       [ sp, 0.0,  cp]]);
 };
 
+/** Return z-rotation matrix by angle phi.
+ * @param {number} phi.
+ */
 StarJs.Vector.Matrix3.r_z = function (phi) {
     var cp = Math.cos(phi), sp = Math.sin(phi);
     return new StarJs.Vector.Matrix3([[ cp,  sp, 0.0],
@@ -327,6 +370,9 @@ StarJs.Time['DEFAULT_JULIAN_DATE'] = {'year': 1582, 'month': 10, 'day': 4};
 StarJs.Time['DEFAULT_JULIAN_JD'] = 2299161;
 StarJs.Time['JD_MJD'] = 2400000.5;
 
+/** Convert Date or timestamp to mjd float.
+ * @param {Date|number} t time
+ */
 StarJs.Time.time2mjd = function (t) {
     if (typeof t !== 'number') {
         t = t.getTime();
@@ -334,6 +380,10 @@ StarJs.Time.time2mjd = function (t) {
     return t / 86400000.0 + 40587.0;
 };
 
+/** Convert mjd to date and time object, taking into account Julian
+ * calendar.
+ * @param jul {number=} JD of Julian date change.
+ */
 StarJs.Time.mjd2dt = function (mjd, jul) {
     if (typeof jul === 'undefined') {
         jul = StarJs.Time['DEFAULT_JULIAN_JD'];
@@ -362,15 +412,29 @@ StarJs.Time.mjd2dt = function (mjd, jul) {
     return t;
 };
 
+/** (h, m, s) to floating-point hour.
+ * @param {number} h hour
+ * @param {number} m minute
+ * @param {number} s second
+ */
 StarJs.Time.hms2hour = function (h, m, s) {
     return h + (m / 60.0) + (s / 3600.0);
 };
 
+/** Convert floating-point hour to hours, minutes and seconds,
+ * returing an object.
+ * @param {number} hour
+ */
 StarJs.Time.hour2hms = function (hour) {
     var dms = new StarJs.Math.Dms(hour);
     return {'hour': dms['degree'], 'minute': dms['minute'], 'second': dms['second']};
 };
 
+/** Convert data-time object to MDJ float, taking into account a Julian
+ * calendar.
+ * @param {number} dt
+ * @param {number=} jul  JD of Julian date change.
+ */
 StarJs.Time.dt2mjd = function (dt, jul) {
     if (typeof jul === 'undefined') {
         jul = StarJs.Time['DEFAULT_JULIAN_DATE'];
@@ -393,10 +457,16 @@ StarJs.Time.dt2mjd = function (dt, jul) {
     return mjdMidnight + frac;
 };
 
+/** Convert MJD to JCT.
+ * @param {number} mjd
+ */
 StarJs.Time.mjd2jct = function (mjd) {
     return (mjd - 51544.5) / 36525.0;
 };
 
+/** Convert MJD to Greenwich Mean Sidereal Time float.
+ * @param mjd {number}
+ */
 StarJs.Time.gmst = function (mjd) {
     /* TODO: move to global */
     var SECS = 86400; // 24*60*60 -- number of seconds in day;
@@ -411,6 +481,8 @@ StarJs.Coord = {};
 
 /** Precession matrix (in ecliptical coordinates) from epoch t1 to
  *  epoch t2.
+ * @param {number} t1
+ * @param {number} t2
  */
 StarJs.Coord.precessionEclMatrix = function (t1, t2) {
     var dt = t2 - t1, p1, p2, pa;
@@ -426,6 +498,8 @@ StarJs.Coord.precessionEclMatrix = function (t1, t2) {
 
 /** Precession matrix (in equatorial coordinates) from epoch t1 to
  *  epoch t2.
+ * @param {number} t1
+ * @param {number} t2
  */
 StarJs.Coord.precessionEquMatrix = function (t1, t2) {
     var dt = t2 - t1, zeta, z, theta;
@@ -439,13 +513,15 @@ StarJs.Coord.precessionEquMatrix = function (t1, t2) {
 };
 
 /** Oliquity of the ecliptic.
-    You may use StarJs.Solar.EPS as constant approximation.
+ *  You may use StarJs.Solar.EPS as constant approximation.
+ * @param {number} jct
  */
 StarJs.Coord.eclipticObliquity = function (jct) {
     return (23.43929111 - (46.8150 + (0.00059 - 0.001813 * jct) * jct) * jct / 3600.0) * StarJs.Math.DEG2RAD;
 };
 
 /** Matrix for conversion from equatorial to ecliptic coordinate system.
+ * @param {number} jct
  */
 StarJs.Coord.equ2eclMatrix = function (jct) {
     var eps = StarJs.Coord.eclipticObliquity(jct);
@@ -453,6 +529,7 @@ StarJs.Coord.equ2eclMatrix = function (jct) {
 };
 
 /** Matrix for conversion from ecliptic to equatorial coordinate system.
+ * @param {number} jct
  */
 StarJs.Coord.ecl2equMatrix = function (jct) {
     var eps = StarJs.Coord.eclipticObliquity(jct);
@@ -460,6 +537,9 @@ StarJs.Coord.ecl2equMatrix = function (jct) {
 };
 
 /** Convert from equatorial to horizontal coordinate system.
+ * @param {number} dec
+ * @param {number} tau
+ * @param {number} lat
  */
 StarJs.Coord.equ2hor = function (dec, tau, lat) {
     var hor_vec = StarJs.Vector.Matrix3.r_y(Math.PI / 2 - lat).apply(new StarJs.Vector.Polar3(tau, dec).toVector3());
@@ -468,6 +548,9 @@ StarJs.Coord.equ2hor = function (dec, tau, lat) {
 };
 
 /** Convert from horizontal to equatorial coordinate system.
+ * @param {number} h
+ * @param {number} az
+ * @param {number} lat
  */
 StarJs.Coord.hor2equ = function (h, az, lat) {
     var equ_vec = StarJs.Vector.Matrix3.r_y(-Math.PI / 2 + lat).apply(new StarJs.Vector.Polar3(az, lat).toVector3());
@@ -514,10 +597,10 @@ StarJs.Kepler.eccAnomaly = function (m, ec, maxiter) {
 };
 
 /** Compute position of a body on elliptical orbit.
- * @param gm Gravity constant.
- * @param m Mean anomaly.
- * @param a Semi-major axis.
- * @param ec Eccentricity.
+ * @param {number} gm Gravity constant.
+ * @param {number} m Mean anomaly.
+ * @param {number} a Semi-major axis.
+ * @param {number} ec Eccentricity.
  */
 StarJs.Kepler.elliptic = function (gm, m, a, ec) {
     var k = Math.sqrt(gm / a), e = StarJs.Kepler.eccAnomaly(m, ec);
@@ -529,11 +612,11 @@ StarJs.Kepler.elliptic = function (gm, m, a, ec) {
 };
 
 /** Compute position of a body on parabolic orbit.
- @param gm Gravity constant.
- @param t0   time of pericenter
- @param t    time to calculate position for
- @param q    pericenter distance
- @param ec Eccentricity.
+ @param {number} gm Gravity constant.
+ @param {number} t0   time of pericenter
+ @param {number} t    time to calculate position for
+ @param {number} q    pericenter distance
+ @param {number} ec Eccentricity.
  @param {number=} maxiter Optional maximal number of iterations.
  */
 StarJs.Kepler.parabolic = function (gm, t0, t, q, ec, maxiter) {
@@ -588,6 +671,8 @@ StarJs.Kepler.parabolic = function (gm, t0, t, q, ec, maxiter) {
 };
 
 /** Compute hyperbolic anomaly.
+ * @param {number} mh
+ * @param {number} e
  * @param {number=} maxiter
  */
 StarJs.Kepler.hypAnom = function (mh, e, maxiter) {
@@ -615,11 +700,11 @@ StarJs.Kepler.hypAnom = function (mh, e, maxiter) {
 };
 
 /** Compute position of a body on hyperbolic orbit.
- * @param gm Gravity constant
- * @param t0 Time of pericenter
- * @param t Time
- * @param a Semi-major axis
- * @param e Eccentricity.
+ * @param {number} gm Gravity constant
+ * @param {number} t0 Time of pericenter
+ * @param {number} t Time
+ * @param {number} a Semi-major axis
+ * @param {number} e Eccentricity.
  */
 StarJs.Kepler.hyperbolic = function (gm, t0, t, a, e) {
     var k, mh, h, ch, sh, rho, fac;
@@ -638,12 +723,12 @@ StarJs.Kepler.hyperbolic = function (gm, t0, t, a, e) {
 };
 
 /** Calculate Keplerian orbital position.
-    @param gm   GM
-    @param t0   time of pericenter
-    @param t    time to calculate position for
-    @param q    pericenter distance
-    @param e    eccentricity
-    @param pqr  Gauss' vector matrix
+    @param {number} gm   GM
+    @param {number} t0   time of pericenter
+    @param {number} t    time to calculate position for
+    @param {number} q    pericenter distance
+    @param {number} e    eccentricity
+    @param {number} pqr  Gauss' vector matrix
  */
 StarJs.Kepler.keplerPos = function (gm, t0, t, q, e, pqr) {
     var M0 = 0.1, EPS = 0.1, m, delta, tau, invax, r;
@@ -665,9 +750,9 @@ StarJs.Kepler.keplerPos = function (gm, t0, t, q, e, pqr) {
 };
 
 /** Return Gauss vectors matrix for given elements.
-    @param omega longitude of the ascending node (radians)
-    @param i     inclination (radians)
-    @param w     argument of pericenter (radians)
+    @param {number} omega longitude of the ascending node (radians)
+    @param {number} i     inclination (radians)
+    @param {number} w     argument of pericenter (radians)
  */
 StarJs.Kepler.gaussVec = function (omega, i, w) {
     return StarJs.Vector.Matrix3.r_z(-omega).mult(StarJs.Vector.Matrix3.r_x(-i))
@@ -768,10 +853,11 @@ StarJs.Solar.EVENTS = [{
 
 /** Calculate Sun and Moon events: rise, set and twilight.
  *
- * start: start time (MJD)
- * end: end day (MJD)
- * lon, lat: geographical coordinates
- * tz: timezone offset function (converts UTC to local).
+ * @param {number} start start time (MJD)
+ * @param {number} end end day (MJD)
+ * @param {number} lambda geographical longitude
+ * @param {number} phi geographical latittude
+ * @param {function(number)=} tz timezone offset function (converts UTC to local).
  *
  * Returns array of objects, each object describes particular day in form:
  *
