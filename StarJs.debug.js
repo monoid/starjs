@@ -1,4 +1,4 @@
-StarJs = {};
+var StarJs = {};
 StarJs.Math = {};
 
 /**
@@ -59,7 +59,7 @@ StarJs.Math.frac = function (x) {
 
 /**
  * Modulo
- * @param {number} dividend
+ * @param {number} x dividend
  * @param {number} r divisor
  * @return {number} remainder
  */
@@ -73,9 +73,9 @@ StarJs.Math.mod = function (x, r) {
  * @constructor
  * @param {number} sign_or_angle sign if four values are passed, angle
  *                 in degrees otherwise
- * @param {number} degree Integer degree part (optional)
- * @param {number} minute Integer minute part (optional)
- * @param {number} second Seconds (optional)
+ * @param {number=} degree Integer degree part (optional)
+ * @param {number=} minute Integer minute part (optional)
+ * @param {number=} second Seconds (optional)
  */
 StarJs.Math.Dms = function (sign_or_angle, degree, minute, second) {
     if (arguments.length === 4) {
@@ -116,7 +116,7 @@ StarJs.Math.Dms.prototype.dms2deg = function () {
  * Convert float degree value to DMS (degree-minute-second).
  * @param {number} deg Angle
  */
-StarJs.Math.Dms.deg2dms = function (deg) {
+StarJs.Math.deg2dms = function (deg) {
     return new StarJs.Math.Dms(deg);
 };
 
@@ -170,7 +170,11 @@ StarJs.Math.cosh = function (x) {
 
 StarJs.Vector = {};
 
-/** @constructor */
+/** @constructor
+ * @param {number} x
+ * @param {number} y
+ * @param {number} z
+ */
 StarJs.Vector.Vector3 = function (x, y, z) {
     this['x'] = x;
     this['y'] = y;
@@ -207,7 +211,10 @@ StarJs.Vector.Vector3 = function (x, y, z) {
     };
 }(StarJs.Vector.Vector3.prototype));
 
-/** @constructor */
+/** @constructor
+ * @param {number=} elev
+ * @param {number=} rad
+ */
 StarJs.Vector.Polar3 = function (az_or_v3, elev, rad) {
     var alen = arguments.length;
     if (alen === 2) {
@@ -245,7 +252,10 @@ StarJs.Vector.Polar3 = function (az_or_v3, elev, rad) {
     };
 }(StarJs.Vector.Polar3.prototype));
 
-/** @constructor */
+/** @constructor
+ * @param {(StarJs.Vector.Vector3|boolean)=} v2
+ * @param {StarJs.Vector.Vector3=} v3
+ */
 StarJs.Vector.Matrix3 = function (v1, v2, v3) {
     if (arguments.length === 3) {
         this['mat'] = [[v1['x'], v1['y'], v1['z']], [v2['x'], v2['y'], v2['z']], [v3['x'], v3['y'], v3['z']]];
@@ -472,9 +482,9 @@ StarJs.Kepler['DEFAULT_ITERATIONS'] = 100;
 StarJs.Kepler['DEFAULT_PRECISION'] = 1e-9;
 
 /** Compute eccentric anomaly for elliptical orbit.
- * @param m Mean anomaly.
- * @param ec Eccentricity (ec < 1)
- * @param maxiter Optional number of iterations.
+ * @param {number} m Mean anomaly.
+ * @param {number} ec Eccentricity (ec < 1)
+ * @param {number=} maxiter Optional number of iterations.
  */
 StarJs.Kepler.eccAnomaly = function (m, ec, maxiter) {
     var i, f, prec = StarJs.Kepler['DEFAULT_PRECISION'];
@@ -524,7 +534,7 @@ StarJs.Kepler.elliptic = function (gm, m, a, ec) {
  @param t    time to calculate position for
  @param q    pericenter distance
  @param ec Eccentricity.
- @param maxiter Optional maximal number of iterations.
+ @param {number=} maxiter Optional maximal number of iterations.
  */
 StarJs.Kepler.parabolic = function (gm, t0, t, q, ec, maxiter) {
     function stumpff(e2, ret) {
@@ -577,7 +587,9 @@ StarJs.Kepler.parabolic = function (gm, t0, t, q, ec, maxiter) {
 //                                         0.0);
 };
 
-/** Compute hyperbolic anomaly. */
+/** Compute hyperbolic anomaly.
+ * @param {number=} maxiter
+ */
 StarJs.Kepler.hypAnom = function (mh, e, maxiter) {
     if (maxiter === undefined) {
         maxiter = StarJs.Kepler['DEFAULT_ITERATIONS'];
