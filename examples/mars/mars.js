@@ -34,17 +34,16 @@ function init(id) {
 
         // Earth-centric ecliptic coordinates of Mars (epoch J2000)
         var marsCoord = marsKeplerCoord.sub(earthKeplerCoord);
-        
+
         // Earth-centric equatorial coordinates of Mars (epoch J2000)
         var marsECoord = StarJs.Coord.ecl2equMatrix(jct).apply(marsCoord);
 
-        // Convert to current Epoch.  Actually, there is small
-        // difference between J2000 and 2011, so this step can be
-        // skipped.  It is written there for completeness.
+        // Convert to current Epoch.  Actually, the difference between
+        // J2000 and 2011 is minimal, so this step can be
+        // skipped.  It is included here just for completeness.
         marsECoord = precessionMatrix.apply(marsECoord);
 
         var marsPolar = new StarJs.Vector.Polar3(marsECoord);
-
 
         var gmst = StarJs.Time.gmst(mjdi);
 

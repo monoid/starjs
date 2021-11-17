@@ -20,6 +20,8 @@ From 2058 observations 2010 Dec. 10-2011 Aug. 1, mean residual 0".5.
     CK10X010  2011 09 10.7226  0.482465  1.000028  343.8056  323.2267    1.8392  20110827  10.0  4.0  C/2010 X1 (Elenin)                                       MPC 75713
     */
     var params = {
+        // By subtracting 2400000.5, we convert element's Julain date to Modified Julian Date aka MJD.
+        // https://scienceworld.wolfram.com/astronomy/ModifiedJulianDate.html
         t0: 2455800.5 - 2400000.5,
         q: 0.482465,
         z: -0.000057,
@@ -43,6 +45,7 @@ From 4943 observations 2009 Aug. 13-2011 Dec. 4, mean residual 0".4.
     */
     var C2009P1_param = {
         title: 'C/2009 P1 (Garradd)',
+        // Again, t0 is MJD
         t0: 2455920.5-2400000.5,
         q: 1.5505367,
         z: -0.0006782,
@@ -55,21 +58,17 @@ From 4943 observations 2009 Aug. 13-2011 Dec. 4, mean residual 0".4.
     calc('output', params);
     calc('output2', C2009P1_param);
 }
-    
+
 function calc(id, params) {
-
     var output = document.getElementById(id);
-
     var mjNow = StarJs.Time.time2mjd(new Date()); // Current Modified Julian day
-
     var R2D = StarJs.Math.RAD2DEG;
 
     var text = '';
 
-
     // Gauss vectors for comet's orbit
     var pqr = StarJs.Kepler.gaussVec(params.node, params.incl, params.peri);
-    
+
     // Equatorial prcession matrix.
     // It changes slowly, so we use one matrix for whole year
     var precessionMatrix = StarJs.Coord.precessionEquMatrix(0, StarJs.Time.mjd2jct(mjNow));
@@ -98,7 +97,7 @@ function calc(id, params) {
         var cometCoord = keplerCoord.sub(earthKeplerCoord);
 
         var distance = cometCoord.len();
-        
+
         // Earth-centric equatorial coordinates of the comet
         var cometECoord = StarJs.Coord.ecl2equMatrix(jct).apply(cometCoord);
 
